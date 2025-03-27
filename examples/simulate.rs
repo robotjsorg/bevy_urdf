@@ -14,6 +14,8 @@ use bevy_urdf::urdf_asset_loader::UrdfAsset;
 
 use rand::Rng;
 
+const DBG: bool = false;
+
 fn main() {
     App::new()
         .add_plugins((
@@ -32,7 +34,8 @@ fn main() {
         })
         .insert_resource(UrdfRobotHandle(None))
         .add_systems(Startup, setup)
-        .add_systems(Update, (control_motors, print_sensor_values))
+        .add_systems(Update, control_motors)
+        .add_systems(Update, print_sensor_values.run_if(|| DBG))
         .add_systems(Update, start_simulation.run_if(in_state(AppState::Loading)))
         .run();
 }
@@ -130,11 +133,11 @@ fn setup(
     ));
 
     // load robot
-    // ew_load_robot.send(LoadRobot {
-    //     urdf_path: "robots/unitree_a1/urdf/a1.urdf".to_string(),
-    //     mesh_dir: "assets/robots/unitree_a1/urdf".to_string(),
-    //     interaction_groups: None,
-    // });
+    ew_load_robot.send(LoadRobot {
+        urdf_path: "robots/unitree_a1/urdf/a1.urdf".to_string(),
+        mesh_dir: "assets/robots/unitree_a1/urdf".to_string(),
+        interaction_groups: None,
+    });
 
     ew_load_robot.send(LoadRobot {
         urdf_path: "robots/flamingo_edu/urdf/Edu_v4.urdf".to_string(),
